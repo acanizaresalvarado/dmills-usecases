@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getCaseBySlug, getCasesByGroup, siteData } from "../../lib/catalog";
+import { reviewedAddOnLink, siteData, useCaseLink } from "../../lib/catalog";
 
 export function getStaticPaths() {
   return siteData.coreCases.map((item) => ({
@@ -132,7 +132,7 @@ const connectedAddOns = siteData.addOns.filter((addOn) => addOn.mappedTo.include
           <section class="section-panel">
             <h2>Connected Reviewed Add-Ons</h2>
             <div class="inline-links">
-              {connectedAddOns.map((addOn) => <a href={`/reviewed-add-ons/${addOn.slug}/`}>{addOn.title}</a>)}
+              {connectedAddOns.map((addOn) => <a href={reviewedAddOnLink(addOn.slug)}>{addOn.title}</a>)}
             </div>
           </section>
         )
@@ -167,7 +167,7 @@ const connectedAddOns = siteData.addOns.filter((addOn) => addOn.mappedTo.include
         <div class="detail-links">
           {
             relatedCases.map((related) => (
-              <a href={`/use-cases/${related.slug}/`}>
+              <a href={useCaseLink(related.slug)}>
                 <strong>{related.code}</strong> {related.title}
               </a>
             ))

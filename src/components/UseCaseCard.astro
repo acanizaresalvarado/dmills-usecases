@@ -1,5 +1,5 @@
 ---
-import type { CoreCase } from "../lib/catalog";
+import { useCaseLink, type CoreCase } from "../lib/catalog";
 
 const { item, showDepartment = false } = Astro.props as {
   item: CoreCase;
@@ -20,7 +20,7 @@ const priorityClass = item.priority.toLowerCase().replace(/[^a-z0-9]+/g, "-");
     <span class="card-link-hint">Open brief</span>
   </div>
   <h3 class="card-title">
-    <a href={`/use-cases/${item.slug}/`}>{item.title}</a>
+    <a href={useCaseLink(item.slug)}>{item.title}</a>
   </h3>
   <p class="card-copy">{item.description}</p>
   <div class="score-grid">

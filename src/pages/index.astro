@@ -3,7 +3,7 @@ import AddOnCard from "../components/AddOnCard.astro";
 import StatsStrip from "../components/StatsStrip.astro";
 import UseCaseExplorer from "../components/UseCaseExplorer.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { formatPriorityLink, siteData, sortAddOns, sortCases } from "../lib/catalog";
+import { formatPriorityLink, groupLink, siteData, sortAddOns, sortCases } from "../lib/catalog";
 
 const coreCases = sortCases(siteData.coreCases);
 const addOns = sortAddOns(siteData.addOns);
@@ -82,7 +82,7 @@ const stats = [
     <div class="route-grid">
       {
         groupCards.map((group) => (
-          <a href={`/groups/${group.slug}/`} class="route-card">
+          <a href={groupLink(group.slug)} class="route-card">
             <span class="route-card-label">{group.label}</span>
             <strong class="route-card-value">{group.caseCount} core cases</strong>
             <span class="route-card-note">{group.firstWave} first-wave items</span>

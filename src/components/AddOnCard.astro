@@ -1,5 +1,5 @@
 ---
-import type { AddOn } from "../lib/catalog";
+import { reviewedAddOnLink, type AddOn } from "../lib/catalog";
 
 const { item } = Astro.props as { item: AddOn };
 ---
@@ -13,7 +13,7 @@ const { item } = Astro.props as { item: AddOn };
     <span class="card-link-hint">Open brief</span>
   </div>
   <h3 class="card-title">
-    <a href={`/reviewed-add-ons/${item.slug}/`}>{item.title}</a>
+    <a href={reviewedAddOnLink(item.slug)}>{item.title}</a>
   </h3>
   <p class="card-copy">{item.overview}</p>
   <div class="card-grid-meta">

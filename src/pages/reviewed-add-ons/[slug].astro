@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { siteData } from "../../lib/catalog";
+import { siteData, useCaseLink } from "../../lib/catalog";
 
 export function getStaticPaths() {
   return siteData.addOns.map((item) => ({
@@ -71,7 +71,7 @@ const mappedCases = item.mappedTo
         <div class="detail-links">
           {
             mappedCases.map((mapped) => (
-              <a href={`/use-cases/${mapped.slug}/`}>
+              <a href={useCaseLink(mapped.slug)}>
                 <strong>{mapped.code}</strong> {mapped.title}
               </a>
             ))

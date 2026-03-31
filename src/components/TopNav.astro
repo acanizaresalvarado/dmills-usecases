@@ -1,9 +1,11 @@
 ---
-import { formatPriorityLink, priorityOrder, siteData } from "../lib/catalog";
+import { addOnsLink, formatPriorityLink, groupLink, homeLink, priorityOrder, siteData, stripBase } from "../lib/catalog";
 
-const pathname = Astro.url.pathname;
-const isActive = (href: string) =>
-  href === "/" ? pathname === href : pathname.startsWith(href);
+const pathname = stripBase(Astro.url.pathname);
+const isActive = (href: string) => {
+  const normalizedHref = stripBase(href);
+  return normalizedHref === "/" ? pathname === normalizedHref : pathname.startsWith(normalizedHref);
+};
 
 const coreCount = siteData.stats.coreCaseCount;
 const addOnCount = siteData.stats.addOnCount;
@@ -11,7 +13,7 @@ const addOnCount = siteData.stats.addOnCount;
 
 <nav class="site-nav">
   <div class="nav-top">
-    <a href="/" class="brand-block">
+    <a href={homeLink()} class="brand-block">
       <span class="brand-mark">DM</span>
       <span class="brand-copy">
         <span class="brand-kicker">AI Compass Internal</span>
@@ -27,8 +29,8 @@ const addOnCount = siteData.stats.addOnCount;
     <div class="nav-cluster">
       <span class="nav-label">Overview</span>
       <div class="nav-link-row">
-        <a class:list={["nav-chip", { active: isActive("/") }]} href="/">All Use Cases</a>
-        <a class:list={["nav-chip", { active: isActive("/add-ons/") }]} href="/add-ons/">Reviewed Add-Ons</a>
+        <a class:list={["nav-chip", { active: isActive("/") }]} href={homeLink()}>All Use Cases</a>
+        <a class:list={["nav-chip", { active: isActive("/add-ons/") }]} href={addOnsLink()}>Reviewed Add-Ons</a>
       </div>
     </div>
     <div class="nav-cluster">
@@ -38,7 +40,7 @@ const addOnCount = siteData.stats.addOnCount;
           siteData.groups.map((group) => (
             <a
               class:list={["nav-chip", { active: isActive(`/groups/${group.slug}/`) }]}
-              href={`/groups/${group.slug}/`}
+              href={groupLink(group.slug)}
             >
               {group.label}
             </a>

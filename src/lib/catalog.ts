@@ -18,9 +18,24 @@ export const prioritySlugMap: Record<string, string> = {
   Trap: "trap",
 };
 
+const BASE_URL = import.meta.env.BASE_URL ?? "/";
+
 export const slugPriorityMap = Object.fromEntries(
   Object.entries(prioritySlugMap).map(([label, slug]) => [slug, label]),
 ) as Record<string, string>;
+
+export function withBase(path: string) {
+  const base = BASE_URL.endsWith("/") ? BASE_URL : `${BASE_URL}/`;
+  const cleanedPath = path === "/" ? "" : path.replace(/^\/+/, "");
+  return `${base}${cleanedPath}`;
+}
+
+export function stripBase(pathname: string) {
+  if (BASE_URL === "/") return pathname;
+  const normalizedBase = BASE_URL.endsWith("/") ? BASE_URL.slice(0, -1) : BASE_URL;
+  if (!normalizedBase) return pathname;
+  return pathname.startsWith(normalizedBase) ? pathname.slice(normalizedBase.length) || "/" : pathname;
+}
 
 function rank<T extends readonly string[]>(value: string, ordered: T) {
   const index = ordered.indexOf(value as T[number]);
@@ -80,5 +95,25 @@ export function countByPriority(cases: CoreCase[]) {
 }
 
 export function formatPriorityLink(priority: string) {
-  return `/priorities/${prioritySlugMap[priority] ?? priority.toLowerCase()}/`;
+  return withBase(`/priorities/${prioritySlugMap[priority] ?? priority.toLowerCase()}/`);
+}
+
+export function homeLink() {
+  return withBase("/");
+}
+
+export function addOnsLink() {
+  return withBase("/add-ons/");
+}
+
+export function groupLink(slug: string) {
+  return withBase(`/groups/${slug}/`);
+}
+
+export function useCaseLink(slug: string) {
+  return withBase(`/use-cases/${slug}/`);
+}
+
+export function reviewedAddOnLink(slug: string) {
+  return withBase(`/reviewed-add-ons/${slug}/`);
 }
