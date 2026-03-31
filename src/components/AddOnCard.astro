@@ -1,0 +1,37 @@
+---
+import type { AddOn } from "../lib/catalog";
+
+const { item } = Astro.props as { item: AddOn };
+---
+
+<div class="addon-card">
+  <div class="card-topline">
+    <div class="card-meta">
+      <span class="pill pill-soft">{item.departmentLabel}</span>
+      <span class="pill">Derived Idea</span>
+    </div>
+    <span class="card-link-hint">Open brief</span>
+  </div>
+  <h3 class="card-title">
+    <a href={`/reviewed-add-ons/${item.slug}/`}>{item.title}</a>
+  </h3>
+  <p class="card-copy">{item.overview}</p>
+  <div class="card-grid-meta">
+    <div>
+      <span class="meta-label">Keep as</span>
+      <span>{item.keepAs}</span>
+    </div>
+    <div>
+      <span class="meta-label">Mapped to</span>
+      <span>{item.mappedTo.join(", ")}</span>
+    </div>
+  </div>
+  <p class="card-note">{item.whyKeep}</p>
+  <div class="card-footer">
+    <div>
+      <span class="meta-label">Positioning</span>
+      <span>{item.keepAs}</span>
+    </div>
+    <strong>Supporting lane</strong>
+  </div>
+</div>

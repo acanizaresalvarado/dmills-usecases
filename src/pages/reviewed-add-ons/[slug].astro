@@ -1,0 +1,83 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { siteData } from "../../lib/catalog";
+
+export function getStaticPaths() {
+  return siteData.addOns.map((item) => ({
+    params: { slug: item.slug },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+const mappedCases = item.mappedTo
+  .map((code) => siteData.coreCases.find((candidate) => candidate.code === code))
+  .filter(Boolean);
+---
+
+<BaseLayout
+  title={`${item.title} | Reviewed Add-On`}
+  description={item.overview}
+  eyebrow={`${item.departmentLabel} • Reviewed Add-On`}
+>
+  <section class="detail-hero">
+    <div class="detail-hero-main section-panel">
+      <div class="card-meta">
+        <span class="pill pill-soft">{item.departmentLabel}</span>
+        <span class="pill">Derived / Adjacent Idea</span>
+      </div>
+      <h2>{item.title}</h2>
+      <p class="section-copy">{item.overview}</p>
+      <div class="signal-grid">
+        <article class="signal-card">
+          <span class="meta-label">Keep as</span>
+          <strong>{item.keepAs}</strong>
+        </article>
+        <article class="signal-card">
+          <span class="meta-label">Mapped cases</span>
+          <strong>{item.mappedTo.join(", ")}</strong>
+        </article>
+      </div>
+    </div>
+    <aside class="detail-hero-side section-panel">
+      <div class="note-banner">
+        This add-on remains visible as a supporting idea, not as a core portfolio line.
+      </div>
+    </aside>
+  </section>
+
+  <section class="detail-layout">
+    <div class="detail-main">
+      <section class="section-panel">
+        <h2>Why Keep It Visible</h2>
+        <ul class="detail-list">
+          <li>{item.whyKeep}</li>
+          <li>Recommended framing: {item.keepAs}.</li>
+        </ul>
+      </section>
+
+      <section class="section-panel">
+        <h2>Why It Is Not A Main Portfolio Line</h2>
+        <ul class="detail-list">
+          <li>{item.whyNotMain}</li>
+          <li>It should stay connected to stronger, evidence-backed use cases rather than compete directly with them.</li>
+        </ul>
+      </section>
+    </div>
+
+    <aside class="detail-aside">
+      <section class="section-panel">
+        <h2>Mapped Core Use Cases</h2>
+        <div class="detail-links">
+          {
+            mappedCases.map((mapped) => (
+              <a href={`/use-cases/${mapped.slug}/`}>
+                <strong>{mapped.code}</strong> {mapped.title}
+              </a>
+            ))
+          }
+        </div>
+      </section>
+    </aside>
+  </section>
+</BaseLayout>

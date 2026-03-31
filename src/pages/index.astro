@@ -1,0 +1,146 @@
+---
+import AddOnCard from "../components/AddOnCard.astro";
+import StatsStrip from "../components/StatsStrip.astro";
+import UseCaseExplorer from "../components/UseCaseExplorer.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { formatPriorityLink, siteData, sortAddOns, sortCases } from "../lib/catalog";
+
+const coreCases = sortCases(siteData.coreCases);
+const addOns = sortAddOns(siteData.addOns);
+const groupCards = siteData.groups.map((group) => ({
+  ...group,
+  caseCount: coreCases.filter((item) => item.departmentSlug === group.slug).length,
+  firstWave: coreCases.filter(
+    (item) => item.departmentSlug === group.slug && item.recommendation === "First Wave",
+  ).length,
+}));
+const priorityCards = [
+  "Quick Win",
+  "Strategic Bet",
+  "Fill-In",
+  "Trap",
+].map((priority) => ({
+  label: priority,
+  href: formatPriorityLink(priority),
+  count: coreCases.filter((item) => item.priority === priority).length,
+}));
+
+const stats = [
+  { label: "Core use cases", value: siteData.stats.coreCaseCount, note: "All curated portfolio items" },
+  { label: "Reviewed add-ons", value: siteData.stats.addOnCount, note: "Adjacent ideas kept visible" },
+  { label: "First-wave items", value: siteData.stats.byRecommendation["First Wave"] ?? 0, note: "Most executable near-term cases" },
+  { label: "Strategic bets", value: siteData.stats.byPriority["Strategic Bet"] ?? 0, note: "Higher-complexity strategic items" },
+];
+---
+
+<BaseLayout
+  title="Dossche Mills AI Opportunity Explorer"
+  description="Interactive internal website for the AI Compass scorecard, including all core use cases, reviewed add-ons, richer detail fields, and navigation by group and priority."
+>
+  <StatsStrip items={stats} />
+
+  <section class="hero-grid">
+    <article class="section-panel spotlight-panel">
+      <p class="eyebrow">What This Includes</p>
+      <h2>One navigable internal layer for the full AI portfolio</h2>
+      <p class="section-copy">
+        This site turns the workbook into a decision-support surface: all core use cases, all reviewed add-ons, the
+        scoring logic, and the richer narrative fields the team needs for internal alignment.
+      </p>
+      <ul class="detail-list">
+        <li>Every core use case from the scorecard v2 is included and linked to a detailed brief.</li>
+        <li>Every reviewed external-draft add-on remains visible in a dedicated supporting lane.</li>
+        <li>Each case expands into problem context, workflow, solution concept, inputs, dependencies, risks, and evidence.</li>
+      </ul>
+    </article>
+    <article class="section-panel spotlight-panel spotlight-panel-muted">
+      <p class="eyebrow">Delivery Model</p>
+      <h2>Read BY, WITH, and FOR as internal delivery dependence</h2>
+      <p class="section-copy">
+        The delivery model is internal to AI Compass: BY means Dossche can execute with our guidance, WITH means we
+        help implement a bounded solution or automation, and FOR means we design and build the solution for them to use.
+      </p>
+      <ul class="detail-list">
+        <li><strong>BY You:</strong> guide, playbook, prompts, lightweight setup.</li>
+        <li><strong>WITH You:</strong> joint implementation, simple automation, bounded pilot support.</li>
+        <li><strong>FOR You:</strong> AI Compass designs and builds the working solution.</li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="route-board">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Group Gateways</p>
+        <h2>Enter through the business lens</h2>
+      </div>
+      <p class="section-copy">
+        Each group page keeps the exact same level of detail while narrowing the portfolio to the operating reality of
+        that team.
+      </p>
+    </div>
+    <div class="route-grid">
+      {
+        groupCards.map((group) => (
+          <a href={`/groups/${group.slug}/`} class="route-card">
+            <span class="route-card-label">{group.label}</span>
+            <strong class="route-card-value">{group.caseCount} core cases</strong>
+            <span class="route-card-note">{group.firstWave} first-wave items</span>
+            <p>{group.diagnosis}</p>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="route-board">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Priority Gateways</p>
+        <h2>Read the portfolio through execution logic</h2>
+      </div>
+      <p class="section-copy">
+        These lanes help the team compare which opportunities are ready to move, which ones need enabling work, and
+        which ones should stay visible without absorbing near-term focus.
+      </p>
+    </div>
+    <div class="route-grid route-grid-tight">
+      {
+        priorityCards.map((item) => (
+          <a href={item.href} class="route-card route-card-priority">
+            <span class="route-card-label">{item.label}</span>
+            <strong class="route-card-value">{item.count} use cases</strong>
+            <p>Cross-group view filtered to this execution lane.</p>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <UseCaseExplorer
+    cases={coreCases}
+    title="Core Portfolio Explorer"
+    intro="Use search and filters to move across group, priority, filter lens, and portfolio position without losing the richness of the underlying scorecard."
+    explorerId="all-core-cases"
+    showDepartment={true}
+    showPriority={true}
+    showFilterLens={true}
+    showRecommendation={true}
+  />
+
+  <section class="section-panel">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Reviewed External Draft</p>
+        <h2>Derived / Adjacent Ideas</h2>
+      </div>
+      <p class="section-copy">
+        These ideas were reviewed from the external draft. They are intentionally preserved without being promoted into
+        the core portfolio unless the evidence and execution logic justify it.
+      </p>
+    </div>
+    <div class="card-grid">
+      {addOns.map((item) => <AddOnCard item={item} />)}
+    </div>
+  </section>
+</BaseLayout>

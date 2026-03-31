@@ -1,0 +1,65 @@
+---
+import type { CoreCase } from "../lib/catalog";
+
+const { item, showDepartment = false } = Astro.props as {
+  item: CoreCase;
+  showDepartment?: boolean;
+};
+
+const priorityClass = item.priority.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+---
+
+<div class:list={["usecase-card", `priority-${priorityClass}`]}>
+  <div class="card-topline">
+    <div class="card-meta">
+      <span class="pill pill-code">{item.code}</span>
+      <span class="pill">{item.priority}</span>
+      <span class="pill">{item.filterLens}</span>
+      {showDepartment && <span class="pill pill-soft">{item.departmentLabel}</span>}
+    </div>
+    <span class="card-link-hint">Open brief</span>
+  </div>
+  <h3 class="card-title">
+    <a href={`/use-cases/${item.slug}/`}>{item.title}</a>
+  </h3>
+  <p class="card-copy">{item.description}</p>
+  <div class="score-grid">
+    <article class="score-card">
+      <span class="meta-label">Value</span>
+      <strong>{item.valueScore}</strong>
+    </article>
+    <article class="score-card">
+      <span class="meta-label">Complexity</span>
+      <strong>{item.complexityScore}</strong>
+    </article>
+    <article class="score-card">
+      <span class="meta-label">AI Maturity</span>
+      <strong>{item.aiMaturity}</strong>
+    </article>
+  </div>
+  <div class="card-grid-meta">
+    <div>
+      <span class="meta-label">Owner</span>
+      <span>{item.owner}</span>
+    </div>
+    <div>
+      <span class="meta-label">Delivery model</span>
+      <span>{item.deliveryMode}</span>
+    </div>
+    <div>
+      <span class="meta-label">Portfolio move</span>
+      <span>{item.recommendation}</span>
+    </div>
+  </div>
+  <p class="card-note">{item.evidenceNotes}</p>
+  <div class="card-tags">
+    {item.themes.slice(0, 3).map((theme) => <span class="mini-tag">{theme}</span>)}
+  </div>
+  <div class="card-footer">
+    <div>
+      <span class="meta-label">First visible win</span>
+      <span>{item.firstVisibleWinDate ?? "TBD"}</span>
+    </div>
+    <strong>Detailed brief</strong>
+  </div>
+</div>

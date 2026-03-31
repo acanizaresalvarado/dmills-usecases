@@ -1,0 +1,67 @@
+---
+import TopNav from "../components/TopNav.astro";
+import { siteData } from "../lib/catalog";
+import "../styles/global.css";
+
+const {
+  title = "Dossche Mills AI Opportunity Explorer",
+  description = "Internal interactive website for the AI Compass scorecard and detailed use-case review.",
+  eyebrow = "AI Compass Internal Explorer",
+} = Astro.props;
+
+const headerStats = [
+  { label: "Core cases", value: siteData.stats.coreCaseCount },
+  { label: "Reviewed add-ons", value: siteData.stats.addOnCount },
+  { label: "Groups", value: siteData.groups.length },
+  { label: "First-wave items", value: siteData.stats.byRecommendation["First Wave"] ?? 0 },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <div class="site-bg"></div>
+    <TopNav />
+    <main class="page-shell">
+      <header class="page-header">
+        <div class="page-header-main">
+          <p class="eyebrow">{eyebrow}</p>
+          <h1>{title}</h1>
+          <p class="page-description">{description}</p>
+        </div>
+        <aside class="page-header-side">
+          <div class="header-side-copy">
+            <span class="header-kicker">Internal Reference Layer</span>
+            <p>
+              A cleaner internal layer built to turn the scorecard into decision-ready use-case briefs without losing
+              the underlying detail.
+            </p>
+          </div>
+          <div class="header-stat-grid">
+            {
+              headerStats.map((item) => (
+                <article class="header-stat">
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
+                </article>
+              ))
+            }
+          </div>
+        </aside>
+      </header>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div>
+        <strong>Dossche Mills AI Opportunity Explorer</strong>
+        <span>Built for internal use from the AI Compass scorecard v2.</span>
+      </div>
+    </footer>
+  </body>
+</html>

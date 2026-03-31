@@ -1,0 +1,37 @@
+---
+import AddOnCard from "../components/AddOnCard.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import StatsStrip from "../components/StatsStrip.astro";
+import { sortAddOns, siteData } from "../lib/catalog";
+
+const addOns = sortAddOns(siteData.addOns);
+const stats = [
+  { label: "Reviewed add-ons", value: addOns.length, note: "Not promoted into the core portfolio" },
+  { label: "Thera", value: addOns.filter((item) => item.departmentLabel === "Thera").length, note: "Reviewed items" },
+  { label: "Procurement", value: addOns.filter((item) => item.departmentLabel === "Procurement").length, note: "Reviewed items" },
+  { label: "R&D / Product", value: addOns.filter((item) => item.departmentLabel === "R&D / Product").length, note: "Reviewed items" },
+];
+---
+
+<BaseLayout
+  title="Reviewed Add-Ons | Dossche Mills AI Opportunity Explorer"
+  description="Adjacent ideas reviewed from the external draft and deliberately kept separate from the curated core portfolio."
+  eyebrow="Reviewed Add-Ons"
+>
+  <StatsStrip items={stats} />
+
+  <section class="section-panel">
+    <p class="eyebrow">How To Use This Section</p>
+    <h2>Supporting ideas that remain visible</h2>
+    <p class="section-copy">
+      These are not discarded ideas. They are simply kept in a separate lane because they are better treated as
+      enabling modules, later-phase extensions, or derivative motions of stronger core use cases.
+    </p>
+  </section>
+
+  <section class="section-panel">
+    <div class="card-grid">
+      {addOns.map((item) => <AddOnCard item={item} />)}
+    </div>
+  </section>
+</BaseLayout>

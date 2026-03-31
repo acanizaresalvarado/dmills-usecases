@@ -1,0 +1,23 @@
+{
+  "name": "dossche-mills-internal-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:data": "python3 ./scripts/build_usecase_data.py",
+    "dev": "npm run build:data && astro dev",
+    "build": "npm run build:data && astro build",
+    "preview": "astro preview"
+  },
+  "keywords": [
+    "astro",
+    "internal-site",
+    "ai-scorecard"
+  ],
+  "author": "Codex",
+  "license": "ISC",
+  "description": "Internal interactive website for the Dossche Mills AI scorecard",
+  "dependencies": {
+    "astro": "^6.1.1"
+  }
+}

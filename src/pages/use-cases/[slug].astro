@@ -1,0 +1,179 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCaseBySlug, getCasesByGroup, siteData } from "../../lib/catalog";
+
+export function getStaticPaths() {
+  return siteData.coreCases.map((item) => ({
+    params: { slug: item.slug },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+const relatedCases = item.relatedUseCases
+  .map((code) => siteData.coreCases.find((candidate) => candidate.code === code))
+  .filter(Boolean);
+const connectedAddOns = siteData.addOns.filter((addOn) => addOn.mappedTo.includes(item.code));
+---
+
+<BaseLayout
+  title={`${item.code} | ${item.title}`}
+  description={item.overview}
+  eyebrow={`${item.departmentLabel} • ${item.priority}`}
+>
+  <section class="detail-hero">
+    <div class="detail-hero-main section-panel">
+      <div class="card-meta">
+        <span class="pill pill-code">{item.code}</span>
+        <span class="pill">{item.departmentLabel}</span>
+        <span class="pill">{item.priority}</span>
+        <span class="pill">{item.filterLens}</span>
+        <span class="pill pill-soft">{item.recommendation}</span>
+      </div>
+      <h2>{item.title}</h2>
+      <p class="section-copy">{item.description}</p>
+      <div class="signal-grid">
+        <article class="signal-card">
+          <span class="meta-label">Owner</span>
+          <strong>{item.owner}</strong>
+        </article>
+        <article class="signal-card">
+          <span class="meta-label">Delivery mode</span>
+          <strong>{item.deliveryMode}</strong>
+        </article>
+        <article class="signal-card">
+          <span class="meta-label">KPI</span>
+          <strong>{item.kpi}</strong>
+        </article>
+        <article class="signal-card">
+          <span class="meta-label">First visible win</span>
+          <strong>{item.firstVisibleWinDate}</strong>
+        </article>
+      </div>
+    </div>
+    <aside class="detail-hero-side section-panel">
+      <div class="note-banner">
+        <strong>Score summary.</strong> {item.scoreSummary}
+      </div>
+      <div class="theme-stack">
+        <span class="meta-label">Key themes</span>
+        <div class="card-tags">
+          {item.themes.map((theme) => <span class="mini-tag">{theme}</span>)}
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="detail-layout">
+    <div class="detail-main">
+      <section class="section-panel">
+        <h2>Problem Context</h2>
+        <p class="detail-prose">{item.problem}</p>
+      </section>
+
+      <section class="section-panel">
+        <h2>Current Workflow</h2>
+        <ul class="detail-list">
+          {item.currentWorkflow.map((line) => <li>{line}</li>)}
+        </ul>
+      </section>
+
+      <section class="section-panel">
+        <h2>Detailed Solution Concept</h2>
+        <ul class="detail-list">
+          {item.solutionConcept.map((line) => <li>{line}</li>)}
+        </ul>
+      </section>
+
+      <section class="section-panel">
+        <h2>Why It Matters</h2>
+        <ul class="detail-list">
+          {item.whyItMatters.map((line) => <li>{line}</li>)}
+        </ul>
+      </section>
+
+      <section class="section-panel">
+        <h2>Inputs / Data Sources</h2>
+        <ul class="detail-list">
+          {item.dataSources.map((line) => <li>{line}</li>)}
+        </ul>
+      </section>
+
+      <section class="section-panel">
+        <h2>Dependencies</h2>
+        <ul class="detail-list">
+          {item.dependencies.map((line) => <li>{line}</li>)}
+        </ul>
+      </section>
+
+      <section class="section-panel">
+        <h2>Risks</h2>
+        <ul class="detail-list">
+          {item.risks.map((line) => <li>{line}</li>)}
+        </ul>
+      </section>
+
+      <section class="section-panel">
+        <h2>Evidence</h2>
+        <ul class="detail-list">
+          {item.evidence.map((line) => <li>{line}</li>)}
+        </ul>
+      </section>
+
+      <section class="section-panel">
+        <h2>Implementation Notes</h2>
+        <ul class="detail-list">
+          {item.implementationNotes.map((line) => <li>{line}</li>)}
+        </ul>
+      </section>
+
+      {
+        connectedAddOns.length > 0 && (
+          <section class="section-panel">
+            <h2>Connected Reviewed Add-Ons</h2>
+            <div class="inline-links">
+              {connectedAddOns.map((addOn) => <a href={`/reviewed-add-ons/${addOn.slug}/`}>{addOn.title}</a>)}
+            </div>
+          </section>
+        )
+      }
+    </div>
+
+    <aside class="detail-aside">
+      <section class="section-panel">
+        <h2>Case Metadata</h2>
+        <ul class="metadata-list">
+          <li><strong>Owner:</strong> {item.owner}</li>
+          <li><strong>KPI:</strong> {item.kpi}</li>
+          <li><strong>First visible win:</strong> {item.firstVisibleWinDate}</li>
+          <li><strong>Delivery model:</strong> {item.deliveryMode}</li>
+          <li><strong>BRACE:</strong> {item.brace}</li>
+          <li><strong>Quadrant:</strong> {item.quadrant}</li>
+          <li><strong>Filter lens:</strong> {item.filterLens}</li>
+          <li><strong>AI maturity:</strong> {item.aiMaturity}</li>
+          <li><strong>Portfolio move:</strong> {item.recommendation}</li>
+        </ul>
+      </section>
+
+      <section class="section-panel">
+        <h2>Primary Users</h2>
+        <ul class="detail-list">
+          {item.primaryUsers.map((line) => <li>{line}</li>)}
+        </ul>
+      </section>
+
+      <section class="section-panel">
+        <h2>Related Use Cases</h2>
+        <div class="detail-links">
+          {
+            relatedCases.map((related) => (
+              <a href={`/use-cases/${related.slug}/`}>
+                <strong>{related.code}</strong> {related.title}
+              </a>
+            ))
+          }
+        </div>
+      </section>
+    </aside>
+  </section>
+</BaseLayout>

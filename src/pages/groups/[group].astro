@@ -1,0 +1,47 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import StatsStrip from "../../components/StatsStrip.astro";
+import UseCaseExplorer from "../../components/UseCaseExplorer.astro";
+import { getCasesByGroup, getGroupBySlug, siteData } from "../../lib/catalog";
+
+export function getStaticPaths() {
+  return siteData.groups.map((group) => ({
+    params: { group: group.slug },
+    props: { group },
+  }));
+}
+
+const { group } = Astro.props;
+const cases = getCasesByGroup(group.slug);
+const stats = [
+  { label: "Core cases", value: cases.length, note: group.label },
+  { label: "Quick wins", value: cases.filter((item) => item.priority === "Quick Win").length, note: "Shorter path to visible value" },
+  { label: "Strategic bets", value: cases.filter((item) => item.priority === "Strategic Bet").length, note: "Higher dependency cases" },
+  { label: "First-wave items", value: cases.filter((item) => item.recommendation === "First Wave").length, note: "Immediate shortlist" },
+];
+---
+
+<BaseLayout
+  title={`${group.label} | Dossche Mills AI Opportunity Explorer`}
+  description={group.diagnosis}
+  eyebrow="Group View"
+>
+  <StatsStrip items={stats} />
+
+  <section class="section-panel">
+    <p class="eyebrow">Group Diagnosis</p>
+    <h2>{group.label}</h2>
+    <p class="section-copy">{group.diagnosis}</p>
+  </section>
+
+  <UseCaseExplorer
+    cases={cases}
+    title={`${group.label} Use Cases`}
+    intro={`Detailed internal view of every curated ${group.label} use case, with richer context than the scorecard workbook alone.`}
+    explorerId={`group-${group.slug}`}
+    showDepartment={false}
+    showPriority={true}
+    showFilterLens={true}
+    showRecommendation={true}
+  />
+</BaseLayout>

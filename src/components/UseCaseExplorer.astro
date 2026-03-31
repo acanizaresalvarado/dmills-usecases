@@ -1,0 +1,206 @@
+---
+import type { CoreCase } from "../lib/catalog";
+import UseCaseCard from "./UseCaseCard.astro";
+
+const {
+  cases,
+  title,
+  intro,
+  explorerId,
+  showDepartment = true,
+  showPriority = true,
+  showDeliveryModel = true,
+  showFilterLens = true,
+  showRecommendation = true,
+} = Astro.props as {
+  cases: CoreCase[];
+  title: string;
+  intro?: string;
+  explorerId: string;
+  showDepartment?: boolean;
+  showPriority?: boolean;
+  showDeliveryModel?: boolean;
+  showFilterLens?: boolean;
+  showRecommendation?: boolean;
+};
+
+const groups = [...new Set(cases.map((item) => item.departmentLabel))];
+const priorities = [...new Set(cases.map((item) => item.priority))];
+const deliveryModels = [...new Set(cases.map((item) => item.deliveryMode))];
+const filters = [...new Set(cases.map((item) => item.filterLens))];
+const recommendations = [...new Set(cases.map((item) => item.recommendation))];
+---
+
+<section class="explorer-panel" data-explorer id={explorerId}>
+  <div class="section-heading explorer-heading">
+    <div class="section-heading-copy">
+      <p class="eyebrow">Interactive Explorer</p>
+      <h2>{title}</h2>
+    </div>
+    <div class="explorer-summary">
+      <span class="summary-badge">{cases.length} curated cases</span>
+      <span class="summary-badge">{groups.length} group{groups.length === 1 ? "" : "s"}</span>
+      <span class="summary-badge">{filters.length} filter lens{filters.length === 1 ? "" : "es"}</span>
+    </div>
+    {intro && <p class="section-copy">{intro}</p>}
+  </div>
+
+  <div class="explorer-controls">
+    <label class="control control-search">
+      <span>Search</span>
+      <input data-role="search" type="search" placeholder="Search title, evidence, KPI, owner..." />
+    </label>
+    {
+      showDepartment && (
+        <label class="control">
+          <span>Group</span>
+          <select data-role="group">
+            <option value="all">All groups</option>
+            {groups.map((group) => <option value={group.toLowerCase()}>{group}</option>)}
+          </select>
+        </label>
+      )
+    }
+    {
+      showPriority && (
+        <label class="control">
+          <span>Priority</span>
+          <select data-role="priority">
+            <option value="all">All priorities</option>
+            {priorities.map((priority) => <option value={priority.toLowerCase()}>{priority}</option>)}
+          </select>
+        </label>
+      )
+    }
+    {
+      showDeliveryModel && (
+        <label class="control">
+          <span>Delivery model</span>
+          <select data-role="delivery">
+            <option value="all">All models</option>
+            {deliveryModels.map((deliveryMode) => <option value={deliveryMode.toLowerCase()}>{deliveryMode}</option>)}
+          </select>
+        </label>
+      )
+    }
+    {
+      showFilterLens && (
+        <label class="control">
+          <span>Filter lens</span>
+          <select data-role="filter">
+            <option value="all">All filters</option>
+            {filters.map((filterLens) => <option value={filterLens.toLowerCase()}>{filterLens}</option>)}
+          </select>
+        </label>
+      )
+    }
+    {
+      showRecommendation && (
+        <label class="control">
+          <span>Portfolio move</span>
+          <select data-role="recommendation">
+            <option value="all">All positions</option>
+            {recommendations.map((recommendation) => <option value={recommendation.toLowerCase()}>{recommendation}</option>)}
+          </select>
+        </label>
+      )
+    }
+  </div>
+
+  <div class="results-row">
+    <strong data-role="results"></strong>
+    <span data-role="hint" class="results-hint"></span>
+    <button type="button" class="ghost-button" data-role="reset">Reset filters</button>
+  </div>
+
+  <div class="card-grid">
+    {
+      cases.map((item) => (
+        <article
+          data-case-card
+          data-search={`${item.code} ${item.title} ${item.departmentLabel} ${item.owner} ${item.description} ${item.evidenceNotes} ${item.kpi}`.toLowerCase()}
+          data-group={item.departmentLabel.toLowerCase()}
+          data-priority={item.priority.toLowerCase()}
+          data-delivery={item.deliveryMode.toLowerCase()}
+          data-filter={item.filterLens.toLowerCase()}
+          data-recommendation={item.recommendation.toLowerCase()}
+        >
+          <UseCaseCard item={item} showDepartment={showDepartment} />
+        </article>
+      ))
+    }
+  </div>
+</section>
+
+<script is:inline>
+  const normalize = (value) => (value || "").toString().trim().toLowerCase();
+  document.querySelectorAll("[data-explorer]").forEach((explorer) => {
+    const search = explorer.querySelector("[data-role='search']");
+    const group = explorer.querySelector("[data-role='group']");
+    const priority = explorer.querySelector("[data-role='priority']");
+    const delivery = explorer.querySelector("[data-role='delivery']");
+    const filterLens = explorer.querySelector("[data-role='filter']");
+    const recommendation = explorer.querySelector("[data-role='recommendation']");
+    const result = explorer.querySelector("[data-role='results']");
+    const hint = explorer.querySelector("[data-role='hint']");
+    const reset = explorer.querySelector("[data-role='reset']");
+    const cards = [...explorer.querySelectorAll("[data-case-card]")];
+
+    const update = () => {
+      const searchValue = normalize(search?.value);
+      const groupValue = normalize(group?.value || "all");
+      const priorityValue = normalize(priority?.value || "all");
+      const deliveryValue = normalize(delivery?.value || "all");
+      const filterValue = normalize(filterLens?.value || "all");
+      const recommendationValue = normalize(recommendation?.value || "all");
+      let visible = 0;
+
+      cards.forEach((card) => {
+        const matches =
+          (searchValue === "" || card.dataset.search.includes(searchValue)) &&
+          (groupValue === "all" || card.dataset.group === groupValue) &&
+          (priorityValue === "all" || card.dataset.priority === priorityValue) &&
+          (deliveryValue === "all" || card.dataset.delivery === deliveryValue) &&
+          (filterValue === "all" || card.dataset.filter === filterValue) &&
+          (recommendationValue === "all" || card.dataset.recommendation === recommendationValue);
+        card.hidden = !matches;
+        if (matches) visible += 1;
+      });
+
+      if (result) {
+        result.textContent = `${visible} use case${visible === 1 ? "" : "s"} visible`;
+      }
+
+      const activeFilters = [];
+      if (searchValue) activeFilters.push(`search: "${searchValue}"`);
+      if (groupValue !== "all") activeFilters.push(`group: ${group?.selectedOptions?.[0]?.textContent || groupValue}`);
+      if (priorityValue !== "all") activeFilters.push(`priority: ${priority?.selectedOptions?.[0]?.textContent || priorityValue}`);
+      if (deliveryValue !== "all") activeFilters.push(`delivery: ${delivery?.selectedOptions?.[0]?.textContent || deliveryValue}`);
+      if (filterValue !== "all") activeFilters.push(`filter: ${filterLens?.selectedOptions?.[0]?.textContent || filterValue}`);
+      if (recommendationValue !== "all") {
+        activeFilters.push(`portfolio: ${recommendation?.selectedOptions?.[0]?.textContent || recommendationValue}`);
+      }
+
+      if (hint) {
+        hint.textContent = activeFilters.length > 0 ? `Filtered by ${activeFilters.join(" • ")}` : "Showing the full current portfolio";
+      }
+    };
+
+    [search, group, priority, delivery, filterLens, recommendation].forEach((element) => {
+      element?.addEventListener("input", update);
+      element?.addEventListener("change", update);
+    });
+
+    reset?.addEventListener("click", () => {
+      if (search) search.value = "";
+      if (group) group.value = "all";
+      if (priority) priority.value = "all";
+      if (delivery) delivery.value = "all";
+      if (filterLens) filterLens.value = "all";
+      if (recommendation) recommendation.value = "all";
+      update();
+    });
+
+    update();
+  });
+</script>

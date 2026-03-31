@@ -1,0 +1,65 @@
+---
+import { formatPriorityLink, priorityOrder, siteData } from "../lib/catalog";
+
+const pathname = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === "/" ? pathname === href : pathname.startsWith(href);
+
+const coreCount = siteData.stats.coreCaseCount;
+const addOnCount = siteData.stats.addOnCount;
+---
+
+<nav class="site-nav">
+  <div class="nav-top">
+    <a href="/" class="brand-block">
+      <span class="brand-mark">DM</span>
+      <span class="brand-copy">
+        <span class="brand-kicker">AI Compass Internal</span>
+        <span class="brand-link">Dossche Mills AI Atlas</span>
+      </span>
+    </a>
+    <div class="nav-status">
+      <span>{coreCount} Core</span>
+      <span>{addOnCount} Add-ons</span>
+    </div>
+  </div>
+  <div class="nav-columns">
+    <div class="nav-cluster">
+      <span class="nav-label">Overview</span>
+      <div class="nav-link-row">
+        <a class:list={["nav-chip", { active: isActive("/") }]} href="/">All Use Cases</a>
+        <a class:list={["nav-chip", { active: isActive("/add-ons/") }]} href="/add-ons/">Reviewed Add-Ons</a>
+      </div>
+    </div>
+    <div class="nav-cluster">
+      <span class="nav-label">Groups</span>
+      <div class="nav-link-row">
+        {
+          siteData.groups.map((group) => (
+            <a
+              class:list={["nav-chip", { active: isActive(`/groups/${group.slug}/`) }]}
+              href={`/groups/${group.slug}/`}
+            >
+              {group.label}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+    <div class="nav-cluster">
+      <span class="nav-label">Priority</span>
+      <div class="nav-link-row">
+        {
+          priorityOrder.map((priority) => (
+            <a
+              class:list={["nav-chip", { active: isActive(formatPriorityLink(priority)) }]}
+              href={formatPriorityLink(priority)}
+            >
+              {priority}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</nav>

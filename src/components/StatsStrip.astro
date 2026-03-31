@@ -1,0 +1,21 @@
+---
+interface StatItem {
+  label: string;
+  value: string | number;
+  note?: string;
+}
+
+const { items } = Astro.props as { items: StatItem[] };
+---
+
+<section class="stats-strip">
+  {
+    items.map((item) => (
+      <article class="stat-card">
+        <span class="stat-label">{item.label}</span>
+        <strong class="stat-value">{item.value}</strong>
+        {item.note && <span class="stat-note">{item.note}</span>}
+      </article>
+    ))
+  }
+</section>

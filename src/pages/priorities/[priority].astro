@@ -1,0 +1,68 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import StatsStrip from "../../components/StatsStrip.astro";
+import UseCaseExplorer from "../../components/UseCaseExplorer.astro";
+import {
+  countByDepartment,
+  getCasesByPriority,
+  priorityOrder,
+  prioritySlugMap,
+  siteData,
+  slugPriorityMap,
+} from "../../lib/catalog";
+
+export function getStaticPaths() {
+  return priorityOrder.map((priority) => ({
+    params: { priority: prioritySlugMap[priority] },
+    props: { priority },
+  }));
+}
+
+const { priority } = Astro.props as { priority: string };
+const cases = getCasesByPriority(priority);
+const departmentCounts = countByDepartment(cases);
+const stats = [
+  { label: "Cases in this lane", value: cases.length, note: priority },
+  ...departmentCounts.map((item) => ({ label: item.label, value: item.value, note: "Cases in this priority lane" })),
+];
+---
+
+<BaseLayout
+  title={`${priority} | Dossche Mills AI Opportunity Explorer`}
+  description={`Cross-group view of all curated use cases currently classified as ${priority}.`}
+  eyebrow="Priority View"
+>
+  <StatsStrip items={stats} />
+
+  <section class="section-panel">
+    <p class="eyebrow">Priority View</p>
+    <h2>{priority}</h2>
+    <p class="section-copy">
+      {cases.length > 0
+        ? `This page collects every curated core use case currently classified as ${priority}, across all groups.`
+        : `There are no curated core portfolio items currently classified as ${priority}. This does not mean the idea lane is irrelevant, only that it is not represented in the current core scorecard cut.`}
+    </p>
+  </section>
+
+  {
+    cases.length > 0 ? (
+      <UseCaseExplorer
+        cases={cases}
+        title={`${priority} Explorer`}
+        intro={`Compare ${priority} items across Thera, Procurement, and R&D / Product in one place.`}
+        explorerId={`priority-${slugPriorityMap[priority]}`}
+        showDepartment={true}
+        showPriority={false}
+        showFilterLens={true}
+        showRecommendation={true}
+      />
+    ) : (
+      <section class="section-panel">
+        <div class="note-banner">
+          The curated portfolio currently concentrates on Quick Wins and Strategic Bets. Lower-priority items remain
+          visible through reviewed add-ons and future iterations, but they are not part of the current core set.
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
